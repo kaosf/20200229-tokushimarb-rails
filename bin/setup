@@ -26,6 +26,8 @@ FileUtils.chdir APP_ROOT do
   # end
 
   puts "\n== Preparing database =="
+  system! '[ -f .env ] || cp .env.example .env'
+  system! 'docker-compose up -d'
   system! 'bin/rails db:prepare'
 
   puts "\n== Removing old logs and tempfiles =="
