@@ -1,15 +1,57 @@
 import consumer from "./consumer"
+import React, { useState } from 'react'
+import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 
-consumer.subscriptions.create("MessageChannel", {
-  connected() {
-    // Called when the subscription is ready for use on the server
-  },
+const Message = props => (
+  <tr>
+    <td>{props.author}</td>
+    <td>{props.body}</td>
+    <td><a href={`/messages/${props.id}`} data-method="delete" data-remote="true" data-confirm="Are you sure?">Destroy</a></td>
+  </tr>
+);
 
-  disconnected() {
-    // Called when the subscription has been terminated by the server
-  },
+Message.propTypes = {
+  id: PropTypes.number.isRequired,
+  author: PropTypes.string,
+  body: PropTypes.string,
+};
 
-  received(data) {
-    // Called when there's incoming data on the websocket for this channel
-  }
-});
+const Messages = props => {
+  const [messages, setMessages] = useState(props.messages);
+
+  consumer.subscriptions.create("MessageChannel", {
+    connected() {
+      // Called when the subscription is ready for use on the server
+    },
+
+    disconnected() {
+      // Called when the subscription has been terminated by the server
+    },
+
+    received(data) {
+      console.log(data);
+      switch(data.event) {
+        case 'create':
+          setMessages([{ key: data.id, id: data.id, author: data.author, body: data.body }].concat(messages));
+          break;
+        case 'delete':
+          setMessages(messages.filter(x => x.id !== data.id));
+          break;
+        default:
+          console.error(`invalid event: ${data.event}`);
+      }
+    }
+  });
+
+  return messages.map(x => <Message key={x.id} id={x.id} author={x.author} body={x.body} />);
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const res = await fetch('/messages.json');
+  const messages = await res.json();
+  ReactDOM.render(
+    <Messages messages={messages} />,
+    document.getElementById('messages'),
+  )
+})

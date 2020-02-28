@@ -4,7 +4,7 @@ class MessagesController < ApplicationController
   # GET /messages
   # GET /messages.json
   def index
-    @messages = Message.all
+    @messages = Message.order(id: :desc)
   end
 
   # GET /messages/1
@@ -30,6 +30,7 @@ class MessagesController < ApplicationController
       if @message.save
         format.html { redirect_to @message, notice: 'Message was successfully created.' }
         format.json { render :show, status: :created, location: @message }
+        format.js { render js: 'clearTextArea()' }
       else
         format.html { render :new }
         format.json { render json: @message.errors, status: :unprocessable_entity }
@@ -58,6 +59,7 @@ class MessagesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to messages_url, notice: 'Message was successfully destroyed.' }
       format.json { head :no_content }
+      format.js { render js: '' }
     end
   end
 
