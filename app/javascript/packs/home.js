@@ -4,12 +4,16 @@ import PropTypes from 'prop-types'
 
 const Hello = props => {
   const [number, setNumber] = useState(0);
+  const [textLength, setTextLength] = useState(0);
 
   return (
     <>
       <div>Hello {props.name}! {props.age} {number}</div>
       <button onClick={() => setNumber(number + 1)}>+1</button>
       <button onClick={() => setNumber(number - 1)}>-1</button>
+      <br />
+      <p>{textLength}</p>
+      <textarea onChange={e => setTextLength(e.target.value.length)}></textarea>
     </>
   );
 }
