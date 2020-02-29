@@ -21,10 +21,7 @@ const Messages = props => {
   const [messages, setMessages] = useState(props.messages);
 
   consumer.subscriptions.create("MessageChannel", {
-    async connected() {
-      const res = await fetch('/messages.json');
-      const messages = await res.json();
-      setMessages(messages);
+    connected() {
     },
 
     disconnected() {
@@ -34,6 +31,9 @@ const Messages = props => {
     received(data) {
       console.log(data);
       switch(data.event) {
+        case 'initialize':
+          setMessages(data.messages);
+          break;
         case 'create':
           setMessages([{ key: data.id, id: data.id, author: data.author, body: data.body }].concat(messages));
           break;
