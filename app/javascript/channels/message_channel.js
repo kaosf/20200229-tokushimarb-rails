@@ -32,6 +32,7 @@ const Messages = props => {
       console.log(data);
       switch(data.event) {
         case 'initialize':
+          // NOTE: 画面初期化時にここを通ったり通らなかったりする タイミングの問題？？？？ よくわからない
           setMessages(data.messages);
           break;
         case 'create':
