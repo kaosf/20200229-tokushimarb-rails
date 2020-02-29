@@ -21,8 +21,10 @@ const Messages = props => {
   const [messages, setMessages] = useState(props.messages);
 
   consumer.subscriptions.create("MessageChannel", {
-    connected() {
-      // Called when the subscription is ready for use on the server
+    async connected() {
+      const res = await fetch('/messages.json');
+      const messages = await res.json();
+      setMessages(messages);
     },
 
     disconnected() {
@@ -48,10 +50,8 @@ const Messages = props => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const res = await fetch('/messages.json');
-  const messages = await res.json();
   ReactDOM.render(
-    <Messages messages={messages} />,
+    <Messages messages={[]} />,
     document.getElementById('messages'),
   )
 })
