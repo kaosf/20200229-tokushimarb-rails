@@ -32,6 +32,8 @@ const Messages = props => {
       console.log(data);
       switch(data.event) {
         case 'initialize':
+          // NOTE: そもそもconsumer.subscription.createが何度も実行されてしまうのでuseEffectを使うべきだった問題がある
+          // NOTE: もうこのブランチではこれ以上考えない方がいい
           // NOTE: 画面初期化時にここを通ったり通らなかったりする タイミングの問題？？？？ よくわからない
           setMessages(data.messages);
           break;
