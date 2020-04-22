@@ -36,7 +36,7 @@ const Messages = props => {
         console.log(data);
         switch(data.event) {
           case 'create':
-            setMessages(messages => [{ key: data.id, id: data.id, author: data.author, body: data.body }].concat(messages));
+            setMessages(messages => [{ key: data.id, id: data.id, author: data.author, body: data.body }, ...messages]);
             break;
           case 'delete':
             setMessages(messages => messages.filter(x => x.id !== data.id));
