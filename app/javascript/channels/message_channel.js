@@ -1,5 +1,5 @@
 import consumer from "./consumer"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
@@ -20,31 +20,33 @@ Message.propTypes = {
 const Messages = props => {
   const [messages, setMessages] = useState(props.messages);
 
-  consumer.subscriptions.create("MessageChannel", {
-    async connected() {
-      const res = await fetch('/messages.json');
-      const messages = await res.json();
-      setMessages(messages);
-    },
+  useEffect(() => {
+    consumer.subscriptions.create("MessageChannel", {
+      async connected() {
+        const res = await fetch('/messages.json');
+        const initialMessages = await res.json();
+        setMessages(messages => initialMessages);
+      },
 
-    disconnected() {
-      // Called when the subscription has been terminated by the server
-    },
+      disconnected() {
+        // Called when the subscription has been terminated by the server
+      },
 
-    received(data) {
-      console.log(data);
-      switch(data.event) {
-        case 'create':
-          setMessages([{ key: data.id, id: data.id, author: data.author, body: data.body }].concat(messages));
-          break;
-        case 'delete':
-          setMessages(messages.filter(x => x.id !== data.id));
-          break;
-        default:
-          console.error(`invalid event: ${data.event}`);
+      received(data) {
+        console.log(data);
+        switch(data.event) {
+          case 'create':
+            setMessages(messages => [{ key: data.id, id: data.id, author: data.author, body: data.body }].concat(messages));
+            break;
+          case 'delete':
+            setMessages(messages => messages.filter(x => x.id !== data.id));
+            break;
+          default:
+            console.error(`invalid event: ${data.event}`);
+        }
       }
-    }
-  });
+    });
+  }, []);
 
   return messages.map(x => <Message key={x.id} id={x.id} author={x.author} body={x.body} />);
 };
